@@ -39,7 +39,7 @@ buscar_elem(Categoria, Elemento) :-
        )
     ;  format('La categoría ~q no existe. ¿Deseas crearla y agregar el elemento? (s/n)\n', [Categoria]),
        read(Resp),
-       ( Resp == s -> add_elem(Categoria, Elemento) ; writeln('Operación cancelada') )
+       ( Resp == s -> add_elem(Categoria, Elemento) ; writeln('Operacion cancelada') )
     ).
 
 % Listar elementos de una categoría
@@ -124,7 +124,7 @@ menu :-
     writeln('7. Obtener tamaño de una categoría'),
     writeln('8. Ordenar lista'),
     writeln('9. Salir'),
-    write('Seleccione una opción: '), 
+    write('Seleccione una opcion: '), 
     read(Op),
     exe_op(Op).
 
@@ -132,36 +132,36 @@ exe_op(1) :-
     show_cats, menu.
 
 exe_op(2) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), write('Ingrese el elemento: '), read(E),
     buscar_elem(C, E), menu.
 
 exe_op(3) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), 
     comprobar_lista(C), menu.
 
 exe_op(4) :- 
-    write('Ingrese la categoría 1: '), 
-    read(C1), write('Ingrese la categoría 2: '), read(C2),
+    write('Ingrese la categoria 1: '), 
+    read(C1), write('Ingrese la categoria 2: '), read(C2),
     demo_concat(C1, C2), menu.
 
 exe_op(5) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), write('Ingrese el elemento que quiere añadir: '), read(E),
     add_elem(C, E), menu.
 
 exe_op(6) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), write('Ingrese el elemento que quiere eliminar: '), read(E),
     del_elem(C, E), menu.
 
 exe_op(7) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), show_size(C), menu.
 
 exe_op(8) :- 
-    write('Ingrese la categoría: '), 
+    write('Ingrese la categoria: '), 
     read(C), ord_lista(C), menu.
 
 exe_op(9) :- 

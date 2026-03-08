@@ -11,9 +11,10 @@
       --text: #1f2b34;
       --muted: #61707b;
       --line: #d9e0e4;
-      --brand: #216b70;
-      --brand-soft: #e4f1ef;
-      --console: #10181d;
+      --brand: #b80f2f;
+      --brand-soft: #f8dde4;
+      --output-bg: #f7faf9;
+      --output-line: #dce7e4;
     }
 
     * { box-sizing: border-box; }
@@ -34,7 +35,7 @@
     }
 
     .panel,
-    .console-box,
+    .output-box,
     .card {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -79,7 +80,7 @@
 
     .menu button.active {
       background: var(--brand-soft);
-      border-color: #b9d6d2;
+      border-color: #e2a9b7;
     }
 
     .card ul,
@@ -97,7 +98,7 @@
       padding: 12px;
       border-radius: 12px;
       background: var(--brand-soft);
-      border: 1px solid #cbe2de;
+      border: 1px solid #e7b7c3;
       font-weight: 600;
     }
 
@@ -148,26 +149,37 @@
       color: var(--text);
     }
 
-    .console-box {
-      overflow: hidden;
+    .output-box {
+      padding: 16px;
     }
 
-    .console-title {
-      padding: 12px 14px;
-      background: #1c2b33;
-      color: #eef5f7;
-      font-weight: 700;
-    }
-
-    .console {
-      min-height: 260px;
-      max-height: 340px;
+    .output {
+      min-height: 220px;
+      max-height: 320px;
       overflow: auto;
-      padding: 14px;
-      background: var(--console);
-      color: #d7ecef;
-      font-family: Consolas, monospace;
-      white-space: pre-wrap;
+      display: grid;
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .output-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--output-bg);
+      border: 1px solid var(--output-line);
+      color: var(--text);
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .output-item.system {
+      background: var(--brand-soft);
+      border-color: #e7b7c3;
+      font-weight: 600;
+    }
+
+    .output-item.action {
+      border-left: 4px solid var(--brand);
     }
 
     .cards {
@@ -234,14 +246,14 @@
         </div>
         <div class="actions">
           <button class="run" id="runAction" type="button">Ejecutar opcion</button>
-          <button class="clear" id="clearConsole" type="button">Limpiar consola</button>
+          <button class="clear" id="clearConsole" type="button">Limpiar salida</button>
         </div>
         <datalist id="categorias"></datalist>
       </section>
 
-      <section class="console-box">
-        <div class="console-title">Consola</div>
-        <div class="console" id="console"></div>
+      <section class="output-box">
+        <h2>Salida</h2>
+        <div class="output" id="output"></div>
       </section>
 
       <section class="panel">
@@ -264,7 +276,7 @@
     const state = JSON.parse(JSON.stringify(initialData));
 
     const cards = document.getElementById("cards");
-    const consoleBox = document.getElementById("console");
+    const outputBox = document.getElementById("output");
     const categoria1 = document.getElementById("categoria1");
     const categoria2 = document.getElementById("categoria2");
     const elemento = document.getElementById("elemento");
@@ -317,9 +329,12 @@
       }
     };
 
-    function print(message) {
-      consoleBox.textContent += message + "\n";
-      consoleBox.scrollTop = consoleBox.scrollHeight;
+    function print(message, type = "") {
+      const item = document.createElement("div");
+      item.className = `output-item${type ? " " + type : ""}`;
+      item.textContent = message;
+      outputBox.appendChild(item);
+      outputBox.scrollTop = outputBox.scrollHeight;
     }
 
     function formatList(list) {
@@ -379,7 +394,7 @@
     }
 
     function showCats() {
-      print("Categorias disponibles:");
+      print("Categorias disponibles:", "system");
       Object.keys(state).sort().forEach(cat => print("- " + cat));
     }
 
@@ -465,11 +480,14 @@
     const actions = { showCats, buscar, listar, concat, add: () => addElem(), del: delElem, size: showSize, sort: sortList, bye };
 
     document.querySelectorAll(".menu button").forEach(button => {
-      button.addEventListener("click", () => setAction(button.dataset.action));
+      button.addEventListener("click", () => {
+        setAction(button.dataset.action);
+        print(button.textContent, "action");
+      });
     });
 
     runAction.addEventListener("click", () => actions[selectedAction]());
-    clearConsole.addEventListener("click", () => { consoleBox.textContent = ""; });
+    clearConsole.addEventListener("click", () => { outputBox.innerHTML = ""; });
 
     [categoria1, categoria2, elemento].forEach(input => {
       input.addEventListener("keydown", event => {
@@ -482,7 +500,7 @@
 
     renderCards();
     setAction("showCats");
-    print("Sistema cargado.");
+    print("Sistema cargado.", "system");
     print("Base consultada: bc.pl");
   </script>
 </body>
