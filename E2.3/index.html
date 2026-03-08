@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agente de Recomendaciones Prolog</title>
+  <style>
+    :root {
+      --bg: #f5f1ea;
+      --panel: #ffffff;
+      --text: #1f2b34;
+      --muted: #61707b;
+      --line: #d9e0e4;
+      --brand: #216b70;
+      --brand-soft: #e4f1ef;
+      --console: #10181d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      width: min(1100px, calc(100% - 24px));
+      margin: 16px auto;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+    }
+
+    .panel,
+    .console-box,
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    h2, h3, p {
+      margin: 0;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 1.15rem;
+    }
+
+    .menu,
+    .fields,
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu button,
+    .run,
+    .clear {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .menu button {
+      width: 100%;
+      padding: 12px 14px;
+      text-align: left;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .menu button.active {
+      background: var(--brand-soft);
+      border-color: #b9d6d2;
+    }
+
+    .card ul,
+    .panel p {
+      color: var(--muted);
+    }
+
+    .main {
+      display: grid;
+      gap: 16px;
+    }
+
+    .prompt {
+      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--brand-soft);
+      border: 1px solid #cbe2de;
+      font-weight: 600;
+    }
+
+    .fields {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .field.hidden {
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .run,
+    .clear {
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    .run {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .clear {
+      background: #eef2f4;
+      color: var(--text);
+    }
+
+    .console-box {
+      overflow: hidden;
+    }
+
+    .console-title {
+      padding: 12px 14px;
+      background: #1c2b33;
+      color: #eef5f7;
+      font-weight: 700;
+    }
+
+    .console {
+      min-height: 260px;
+      max-height: 340px;
+      overflow: auto;
+      padding: 14px;
+      background: var(--console);
+      color: #d7ecef;
+      font-family: Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 14px;
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .app,
+      .fields,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <h2>Menu del agente</h2>
+      <div class="menu">
+        <button class="active" data-action="showCats">1. Mostrar categorias</button>
+        <button data-action="buscar">2. Buscar elemento</button>
+        <button data-action="listar">3. Listar elementos</button>
+        <button data-action="concat">4. Concatenar categorias</button>
+        <button data-action="add">5. Agregar elemento</button>
+        <button data-action="del">6. Eliminar elemento</button>
+        <button data-action="size">7. Obtener tamano</button>
+        <button data-action="sort">8. Ordenar lista</button>
+        <button data-action="bye">9. Salir</button>
+      </div>
+    </aside>
+
+    <section class="main">
+      <section class="panel">
+        <h2>Entrada</h2>
+        <div class="prompt" id="prompt">Esta opcion no necesita datos. Presiona "Ejecutar opcion".</div>
+        <div class="fields">
+          <div class="field hidden" id="fieldCategoria1">
+            <label for="categoria1">Categoria</label>
+            <input id="categoria1" list="categorias" placeholder="Ej. musica">
+          </div>
+          <div class="field hidden" id="fieldCategoria2">
+            <label for="categoria2">Categoria 2</label>
+            <input id="categoria2" list="categorias" placeholder="Ej. libros">
+          </div>
+          <div class="field hidden" id="fieldElemento">
+            <label for="elemento">Elemento</label>
+            <input id="elemento" placeholder="Ej. zelda">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="run" id="runAction" type="button">Ejecutar opcion</button>
+          <button class="clear" id="clearConsole" type="button">Limpiar consola</button>
+        </div>
+        <datalist id="categorias"></datalist>
+      </section>
+
+      <section class="console-box">
+        <div class="console-title">Consola</div>
+        <div class="console" id="console"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Base de conocimiento actual</h2>
+        <div class="cards" id="cards"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const initialData = {
+      musica: ["Metallica", "Eagle", "Michael Jackson"],
+      libros: ["Neuromancer", "Snow Crash", "I Robot"],
+      podcasts: ["Lex Fridman", "Data Skeptic", "AI Today"],
+      peliculas: ["The Matrix", "Inception", "Blade Runner", "Avatar"],
+      juegos: ["mario"],
+      series: ["Black Mirror", "Altered Carbon", "Westworld", "Severance"]
+    };
+
+    const state = JSON.parse(JSON.stringify(initialData));
+
+    const cards = document.getElementById("cards");
+    const consoleBox = document.getElementById("console");
+    const categoria1 = document.getElementById("categoria1");
+    const categoria2 = document.getElementById("categoria2");
+    const elemento = document.getElementById("elemento");
+    const datalist = document.getElementById("categorias");
+    const promptBox = document.getElementById("prompt");
+    const fieldCategoria1 = document.getElementById("fieldCategoria1");
+    const fieldCategoria2 = document.getElementById("fieldCategoria2");
+    const fieldElemento = document.getElementById("fieldElemento");
+    const runAction = document.getElementById("runAction");
+    const clearConsole = document.getElementById("clearConsole");
+
+    let selectedAction = "showCats";
+
+    const actionConfig = {
+      showCats: {
+        prompt: 'Esta opcion no necesita datos. Presiona "Ejecutar opcion".',
+        fields: []
+      },
+      buscar: {
+        prompt: "Ingresa una categoria y un elemento.",
+        fields: ["categoria1", "elemento"]
+      },
+      listar: {
+        prompt: "Ingresa una categoria.",
+        fields: ["categoria1"]
+      },
+      concat: {
+        prompt: "Ingresa dos categorias.",
+        fields: ["categoria1", "categoria2"]
+      },
+      add: {
+        prompt: "Ingresa la categoria y el elemento que deseas agregar.",
+        fields: ["categoria1", "elemento"]
+      },
+      del: {
+        prompt: "Ingresa la categoria y el elemento que deseas eliminar.",
+        fields: ["categoria1", "elemento"]
+      },
+      size: {
+        prompt: "Ingresa una categoria.",
+        fields: ["categoria1"]
+      },
+      sort: {
+        prompt: "Ingresa una categoria.",
+        fields: ["categoria1"]
+      },
+      bye: {
+        prompt: 'Esta opcion no necesita datos. Presiona "Ejecutar opcion".',
+        fields: []
+      }
+    };
+
+    function print(message) {
+      consoleBox.textContent += message + "\n";
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    function formatList(list) {
+      return "[" + list.map(item => JSON.stringify(item)).join(", ") + "]";
+    }
+
+    function concatPropia(list1, list2) {
+      return [...list1, ...list2];
+    }
+
+    function uniqueSorted(list) {
+      return [...new Set(list)].sort((a, b) => a.localeCompare(b));
+    }
+
+    function sortedWithDuplicates(list) {
+      return [...list].sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderDataList() {
+      datalist.innerHTML = "";
+      Object.keys(state).sort().forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        datalist.appendChild(option);
+      });
+    }
+
+    function renderCards() {
+      cards.innerHTML = "";
+      Object.keys(state).sort().forEach(cat => {
+        const article = document.createElement("article");
+        article.className = "card";
+        article.innerHTML = `<h3>${cat}</h3><ul>${state[cat].map(item => `<li>${item}</li>`).join("")}</ul>`;
+        cards.appendChild(article);
+      });
+      renderDataList();
+    }
+
+    function getCategory(input) {
+      return input.value.trim();
+    }
+
+    function getElement() {
+      return elemento.value.trim();
+    }
+
+    function setAction(action) {
+      selectedAction = action;
+      const config = actionConfig[action];
+      promptBox.textContent = config.prompt;
+      fieldCategoria1.classList.toggle("hidden", !config.fields.includes("categoria1"));
+      fieldCategoria2.classList.toggle("hidden", !config.fields.includes("categoria2"));
+      fieldElemento.classList.toggle("hidden", !config.fields.includes("elemento"));
+      document.querySelectorAll(".menu button").forEach(button => {
+        button.classList.toggle("active", button.dataset.action === action);
+      });
+    }
+
+    function showCats() {
+      print("Categorias disponibles:");
+      Object.keys(state).sort().forEach(cat => print("- " + cat));
+    }
+
+    function addElem(forcedCat, forcedItem) {
+      const cat = forcedCat || getCategory(categoria1);
+      const item = forcedItem || getElement();
+      if (!cat || !item) return print("Faltan datos: ingresa categoria y elemento.");
+      if (!state[cat]) state[cat] = [];
+      state[cat].push(item);
+      renderCards();
+      print(`Elemento agregado con exito en "${cat}".`);
+      print("En Prolog esta accion llama a guardar_bc/0.");
+    }
+
+    function buscar() {
+      const cat = getCategory(categoria1);
+      const item = getElement();
+      if (!cat || !item) return print("Faltan datos: ingresa categoria y elemento.");
+      if (state[cat]) {
+        if (state[cat].includes(item)) {
+          print(`Elemento "${item}" encontrado en la categoria "${cat}".`);
+        } else if (confirm(`El elemento "${item}" no existe en "${cat}".\n\nDeseas agregarlo?`)) {
+          addElem(cat, item);
+        } else {
+          print("Operacion cancelada.");
+        }
+      } else if (confirm(`La categoria "${cat}" no existe.\n\nDeseas crearla y agregar "${item}"?`)) {
+        addElem(cat, item);
+      } else {
+        print("Operacion cancelada.");
+      }
+    }
+
+    function listar() {
+      const cat = getCategory(categoria1);
+      if (!cat) return print("Ingresa una categoria.");
+      if (!state[cat]) return print(`La categoria "${cat}" no existe.`);
+      print(`Recomendaciones para ${cat}:`);
+      state[cat].forEach(item => print("- " + item));
+    }
+
+    function concat() {
+      const cat1 = getCategory(categoria1);
+      const cat2 = getCategory(categoria2);
+      if (!cat1 || !cat2) return print("Ingresa dos categorias para concatenar.");
+      if (!state[cat1] || !state[cat2]) return print("Una o ambas categorias no existen.");
+      print(`Concatenacion propia: ${formatList(concatPropia(state[cat1], state[cat2]))}`);
+      print(`Concatenacion append: ${formatList([...state[cat1], ...state[cat2]])}`);
+    }
+
+    function delElem() {
+      const cat = getCategory(categoria1);
+      const item = getElement();
+      if (!cat || !item) return print("Faltan datos: ingresa categoria y elemento.");
+      if (!state[cat]) return print("Categoria no encontrada.");
+      const index = state[cat].indexOf(item);
+      if (index === -1) return print("Elemento no encontrado en la lista.");
+      state[cat].splice(index, 1);
+      renderCards();
+      print(`Elemento eliminado con exito de "${cat}".`);
+      print("En Prolog esta accion llama a guardar_bc/0.");
+    }
+
+    function showSize() {
+      const cat = getCategory(categoria1);
+      if (!cat) return print("Ingresa una categoria.");
+      if (!state[cat]) return print(`La categoria "${cat}" no existe.`);
+      print(`Recomendaciones para ${cat}: ${state[cat].length}`);
+    }
+
+    function sortList() {
+      const cat = getCategory(categoria1);
+      if (!cat) return print("Ingresa una categoria.");
+      if (!state[cat]) return print(`La categoria "${cat}" no existe.`);
+      print(`Recomendaciones ordenadas (Sort) para ${cat}: ${formatList(uniqueSorted(state[cat]))}`);
+      print(`Recomendaciones ordenadas (Msort) para ${cat}: ${formatList(sortedWithDuplicates(state[cat]))}`);
+    }
+
+    function bye() {
+      print("Bye!");
+    }
+
+    const actions = { showCats, buscar, listar, concat, add: () => addElem(), del: delElem, size: showSize, sort: sortList, bye };
+
+    document.querySelectorAll(".menu button").forEach(button => {
+      button.addEventListener("click", () => setAction(button.dataset.action));
+    });
+
+    runAction.addEventListener("click", () => actions[selectedAction]());
+    clearConsole.addEventListener("click", () => { consoleBox.textContent = ""; });
+
+    [categoria1, categoria2, elemento].forEach(input => {
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          actions[selectedAction]();
+        }
+      });
+    });
+
+    renderCards();
+    setAction("showCats");
+    print("Sistema cargado.");
+    print("Base consultada: bc.pl");
+  </script>
+</body>
+</html>
