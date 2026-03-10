@@ -1,3 +1,15 @@
+/*
+    Diego Josuan Ornelas Durán
+    Emmanuel Murillo Picaso
+    Jimena Ramirez
+    Mario Rizo Romo
+    Silvano Joset Valdivia Franco
+
+    E2.3 Construcción de Agentes
+    Fecha: 07/03/2026
+    Descripción: Agente de Recomendaciones
+*/
+
 :- use_module(library(lists)). % Para usar funciones de listas
 
 :- dynamic recomendacion/2.

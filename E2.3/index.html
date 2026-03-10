@@ -1,9 +1,22 @@
+<!--
+    Diego Josuan Ornelas Durán
+    Emmanuel Murillo Picaso
+    Jimena Ramirez
+    Mario Rizo Romo
+    Silvano Joset Valdivia Franco
+
+    E2.3 Construcción de Agentes
+    Fecha: 07/03/2026
+    Descripción: Agente de Recomendaciones
+-->
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agente de Recomendaciones Prolog</title>
+  <title>Agente de Recomendaciones - Eq.02</title>
   <style>
     :root {
       --bg: #f5f1ea;
@@ -17,7 +30,9 @@
       --output-line: #dce7e4;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -46,7 +61,9 @@
       padding: 16px;
     }
 
-    h2, h3, p {
+    h2,
+    h3,
+    p {
       margin: 0;
     }
 
@@ -201,6 +218,7 @@
     }
 
     @media (max-width: 900px) {
+
       .app,
       .fields,
       .cards {
@@ -209,34 +227,34 @@
     }
   </style>
 </head>
+
 <body>
   <main class="app">
     <aside class="panel">
-      <h2>Menu del agente</h2>
+      <h2>Menú</h2>
       <div class="menu">
-        <button class="active" data-action="showCats">1. Mostrar categorias</button>
+        <button class="active" data-action="showCats">1. Mostrar categorías</button>
         <button data-action="buscar">2. Buscar elemento</button>
         <button data-action="listar">3. Listar elementos</button>
-        <button data-action="concat">4. Concatenar categorias</button>
+        <button data-action="concat">4. Concatenar categorías</button>
         <button data-action="add">5. Agregar elemento</button>
         <button data-action="del">6. Eliminar elemento</button>
-        <button data-action="size">7. Obtener tamano</button>
+        <button data-action="size">7. Obtener tamaño</button>
         <button data-action="sort">8. Ordenar lista</button>
-        <button data-action="bye">9. Salir</button>
       </div>
     </aside>
 
     <section class="main">
       <section class="panel">
         <h2>Entrada</h2>
-        <div class="prompt" id="prompt">Esta opcion no necesita datos. Presiona "Ejecutar opcion".</div>
+        <div class="prompt" id="prompt">Esta opción no necesita datos. Presiona "Ejecutar".</div>
         <div class="fields">
           <div class="field hidden" id="fieldCategoria1">
-            <label for="categoria1">Categoria</label>
+            <label for="categoria1">Categoría</label>
             <input id="categoria1" list="categorias" placeholder="Ej. musica">
           </div>
           <div class="field hidden" id="fieldCategoria2">
-            <label for="categoria2">Categoria 2</label>
+            <label for="categoria2">Categoría 2</label>
             <input id="categoria2" list="categorias" placeholder="Ej. libros">
           </div>
           <div class="field hidden" id="fieldElemento">
@@ -245,7 +263,7 @@
           </div>
         </div>
         <div class="actions">
-          <button class="run" id="runAction" type="button">Ejecutar opcion</button>
+          <button class="run" id="runAction" type="button">Ejecutar</button>
           <button class="clear" id="clearConsole" type="button">Limpiar salida</button>
         </div>
         <datalist id="categorias"></datalist>
@@ -292,39 +310,39 @@
 
     const actionConfig = {
       showCats: {
-        prompt: 'Esta opcion no necesita datos. Presiona "Ejecutar opcion".',
+        prompt: 'Esta opción no necesita datos. Presiona "Ejecutar".',
         fields: []
       },
       buscar: {
-        prompt: "Ingresa una categoria y un elemento.",
+        prompt: "Ingresa una categoría y un elemento.",
         fields: ["categoria1", "elemento"]
       },
       listar: {
-        prompt: "Ingresa una categoria.",
+        prompt: "Ingresa una categoría.",
         fields: ["categoria1"]
       },
       concat: {
-        prompt: "Ingresa dos categorias.",
+        prompt: "Ingresa dos categorías.",
         fields: ["categoria1", "categoria2"]
       },
       add: {
-        prompt: "Ingresa la categoria y el elemento que deseas agregar.",
+        prompt: "Ingresa la categoría y el elemento que deseas agregar.",
         fields: ["categoria1", "elemento"]
       },
       del: {
-        prompt: "Ingresa la categoria y el elemento que deseas eliminar.",
+        prompt: "Ingresa la categoría y el elemento que deseas eliminar.",
         fields: ["categoria1", "elemento"]
       },
       size: {
-        prompt: "Ingresa una categoria.",
+        prompt: "Ingresa una categoría.",
         fields: ["categoria1"]
       },
       sort: {
-        prompt: "Ingresa una categoria.",
+        prompt: "Ingresa una categoría.",
         fields: ["categoria1"]
       },
       bye: {
-        prompt: 'Esta opcion no necesita datos. Presiona "Ejecutar opcion".',
+        prompt: 'Esta opción no necesita datos. Presiona "Ejecutar".',
         fields: []
       }
     };
@@ -401,27 +419,27 @@
     function addElem(forcedCat, forcedItem) {
       const cat = forcedCat || getCategory(categoria1);
       const item = forcedItem || getElement();
-      if (!cat || !item) return print("Faltan datos: ingresa categoria y elemento.");
+      if (!cat || !item) return print("Faltan datos: ingresa categoría y elemento.");
       if (!state[cat]) state[cat] = [];
       state[cat].push(item);
       renderCards();
-      print(`Elemento agregado con exito en "${cat}".`);
-      print("En Prolog esta accion llama a guardar_bc/0.");
+      print(`Elemento agregado con éxito en "${cat}".`);
+      print("En Prolog esta acción llama a guardar_bc/0.");
     }
 
     function buscar() {
       const cat = getCategory(categoria1);
       const item = getElement();
-      if (!cat || !item) return print("Faltan datos: ingresa categoria y elemento.");
+      if (!cat || !item) return print("Faltan datos: ingresa categoría y elemento.");
       if (state[cat]) {
         if (state[cat].includes(item)) {
-          print(`Elemento "${item}" encontrado en la categoria "${cat}".`);
-        } else if (confirm(`El elemento "${item}" no existe en "${cat}".\n\nDeseas agregarlo?`)) {
+          print(`Elemento "${item}" encontrado en la categoría "${cat}".`);
+        } else if (confirm(`El elemento "${item}" no existe en "${cat}".\n\n¿Deseas agregarlo?`)) {
           addElem(cat, item);
         } else {
-          print("Operacion cancelada.");
+          print("Operación cancelada.");
         }
-      } else if (confirm(`La categoria "${cat}" no existe.\n\nDeseas crearla y agregar "${item}"?`)) {
+      } else if (confirm(`La categoría "${cat}" no existe.\n\n¿Deseas crearla y agregar "${item}"?`)) {
         addElem(cat, item);
       } else {
         print("Operacion cancelada.");
@@ -455,7 +473,7 @@
       state[cat].splice(index, 1);
       renderCards();
       print(`Elemento eliminado con exito de "${cat}".`);
-      print("En Prolog esta accion llama a guardar_bc/0.");
+      print("En Prolog esta acción llama a guardar_bc/0.");
     }
 
     function showSize() {
@@ -504,4 +522,5 @@
     print("Base consultada: bc.pl");
   </script>
 </body>
+
 </html>
